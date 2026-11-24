@@ -6,7 +6,7 @@ A password-protected strategist workspace for the Zenith Racing Series, in the s
 
 ## 1. Add it to your portfolio (5 minutes)
 
-1. Copy the folder **`1-publish-this/strategy/`** into the root of your portfolio repository, so the site serves `https://<you>.github.io/strategy/`.
+1. Copy the folder **`1-publish-this/strategy/`** into the root of your portfolio repository, so the site serves `burressi.pit-wall.io`.
    - Plain HTML or Jekyll site: put `strategy/` next to your home `index.html`.
    - React / Vite / Next build: put it in `public/strategy/` so the build copies it as-is.
 2. Add a link wherever your navigation lives, for example:
