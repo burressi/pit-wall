@@ -1,106 +1,140 @@
-# Race Strategy — private live-timing section for your portfolio
+# Pit wall
 
-A password-protected strategist workspace for the Zenith Racing Series, in the spirit of P1TS. It has a pit-wall screen built from your layout draft (car ahead and behind, gap history, pit window, lap ring with the pit-stop rejoin point, race control), a crew view for phones, and the full analysis board. It connects directly to Al Kamel live timing and records each session. It is one static page, so it drops straight into a GitHub Pages portfolio with no server.
+A live race-strategy screen, in the spirit of P1TS, built on **Al Kamel live timing**. It was made for the Zenith Racing Series and Cambern Performance (#177 ZR3, #178 ZR2), but works with any series on livetiming.alkamelsystems.com.
+
+The screens show: car ahead and behind, gap and closing rate, gap history, pit window by lap with rejoin position and traffic, a lap ring with the pit-stop rejoin point, class standings, race control, fuel and stint planning, a pit-stop predictor, and a strategy-call log. There is a phone layout for the crew.
+
+**The site:** `https://<github-account>.github.io/<repo-name>/`, for example `https://burressi.github.io/pit-wall/`.
 
 ---
 
-## 1. Add it to your portfolio (5 minutes)
+## How it gets live data
 
-1. Copy the folder **`1-publish-this/strategy/`** into the root of your portfolio repository, so the site serves `burressi.pit-wall.io`.
-   - Plain HTML or Jekyll site: put `strategy/` next to your home `index.html`.
-   - React / Vite / Next build: put it in `public/strategy/` so the build copies it as-is.
-2. Add a link wherever your navigation lives, for example:
-   ```html
-   <a href="strategy/">Race Strategy 🔒</a>
-   ```
-3. Commit and push. Open the link and unlock it with the temporary password you were given.
-4. **Change the password before you share the link** (next section).
+Al Kamel's timing page doesn't refresh. It keeps one connection open, and Al Kamel sends every change as it happens: line crossings, timing points, pit in/out, flags, race control and weather. The pit wall opens the same kind of connection and recalculates the screens on every update.
 
-Only `strategy/index.html` is published. Everything in it — the app, the 2026 race replays and your team's numbers — is encrypted (AES-256-GCM, key derived from the password with PBKDF2-SHA256, 600,000 rounds). Without the password the page is just a login box.
+There are two ways to run it:
 
-## 2. Change the password
-
-Open **`2-tools/change-password.html`** in your browser (double-click it; it runs offline). Choose your current `strategy/index.html`, type the current password and a new one, and save the downloaded `index.html` over the old file. Push it.
-
-- Use a passphrase of four or more random words. Anyone with the page file can try passwords offline, so length is what protects it.
-- "Keep me unlocked on this device" stores the decryption key in that browser. Use **Lock** (top right) to forget it. Changing the password logs every device out.
-
-## 3. Going live at a race weekend
-
-### Option A — Direct connection to Al Kamel live timing (recommended)
-
-The page now connects to the live timing feed itself, the same way the timing website does (SockJS WebSocket, `livetimingFeed` for the series, then the chosen session's standings, pit, flag, race control, weather and entry data). You don't need the timing tab open or any bookmark, and it works on the crew's phones.
-
-1. Unlock the page and open **Data source → 1**.
-2. **Series:** `zenith` (the part after `livetiming.alkamelsystems.com/`). Use another series, e.g. `hsr`, for a rehearsal.
-3. **Session:** leave **Auto** to follow whichever session is running (it switches from practice to qualifying to the race by itself), or pick one from the list, which shows each session's local start time.
-4. Leave **Record the session** ticked on the pit-wall laptop and click **Connect**. The source pill at the top shows *Live · data 0.4 s old*.
-5. After the session, click **Download recording** (Data source → 1). It saves every message as a compressed `.jsonl.gz` file on your computer. The page warns you if you try to close it with an unsaved recording.
-
-If **Connect** is refused: in **Advanced**, try **Plain WebSocket**; then **via my proxy** (needs the optional proxy below); then use Option B.
-
-**Which data sets the page asks for.** The feed and session list are confirmed from your captures. The names of the per-session data sets (standings, pit info, status, race control, weather, entry list) were not in the captures, so the page tries the likely names, keeps the ones the server accepts and remembers them. Data source → 1 lists which ones are working. To copy the timing page's own list instead: open the session on the timing page with developer tools → Network → WS → Messages, type **params** in the filter, copy all the lines, paste them into **Advanced** and click **Learn from capture**.
-
-### Test it now with your Ferrari Challenge recording
-
-You already have `ferrarichallenge_…raw.jsonl.gz` from the recorder script. Open **Data source → 2** and drop that file in. It plays through the same screens as live (Play, speed, slider), so you can check the standings decoding before race day. That recording is of a session that had already finished, so expect final standings rather than lap-by-lap racing. If the pit wall stays empty, open **Analysis → Feed inspector → Copy diagnostics** and share that text so the decoding can be adjusted.
-
-Next live chance on the same platform: the HSR Sebring Classic 12 Hour (December 2–6). Connect with series `hsr` and record it; that recording will confirm the live lap-by-lap decoding.
-
-### Option B — Bridge from the timing page (fallback)
-
-If the direct connection is refused, open the Zenith timing page in the same browser and click the **Strategy bridge** bookmark there (copy its code from Data source → 3, or install the userscript). The page then passes what it receives to your dashboard tab. Using the bridge once also teaches the direct connection the page's own data-set list.
-
-### Option C — Official results files (back-fill and near-live)
-
-Al Kamel posts analysis CSVs for each session (hourly during races) on the Zenith results site. Drop a downloaded **23_Analysis…CSV** onto **Data source → 4**. During a live session it fills in full lap history for every car (useful if you joined late or lost the connection); otherwise it opens the file as a replay. To fetch by address and refresh automatically, set up the optional proxy (`3-optional-proxy/README.md`).
-
-### First live session checklist (practice 1)
-
-1. **Data source → 1** should show the feed connected, the session name and, under *Data sets*, `ok` for standings.
-2. The pit wall should show the full field in the timing tower, laps ticking over and a sensible time remaining. If it doesn't, check **Analysis → Feed inspector**, then **Copy diagnostics** and share that text.
-3. Set **Settings → Track preset** for the event (2026 pace, pit-lane times and fuel burn), and **Pit entry / Pit exit** if you want the pit lane drawn in the right place on the lap ring.
-
-## 4. What is on screen
-
-Two screens, switched at the top: **Pit wall** (your layout draft, the default) and **Analysis** (the full P1TS-style board). On a phone the pit wall becomes the **crew view** automatically.
-
-### Pit wall (laptop)
-
-| Area | What it shows |
-|---|---|
-| Top bar | Series and session, **Lap N · time left**, flag (a dashed outline means a caution inferred from lap times), our car's overall and class position, air and track temperature from the feed, and how old the data is |
-| Car ahead / Car behind | Gap from line-crossing times, closing rate (median change per lap over the last clean laps) and "catch in about N laps". Class neighbours by default; switch to **Overall** above the gap history. The card turns amber when the car behind will reach us within 10 laps |
-| Gap history · last 20 laps | Solid blue: gap to the car ahead. Dashed amber: gap to the car behind. Below zero means that car was on the other side of us then; ▼ marks pit laps |
-| Last / Best / Last 5 avg / Stint trend | Our car's lap times; stint trend is seconds per lap of fall-off over the current stint, ignoring traffic and incident laps |
-| Timing tower | **Around us**, **Our class** or **All**: position, class position, car, class, gap, last lap, pits, Track/Box |
-| Pit window | Box this lap, when the window opens, the best lap in the window, the last lap the fuel covers, and under yellow. For each one: class (overall) rejoin position, time lost, and traffic at the rejoin point |
-| Lap tracker · pit window | Every car placed round the lap. We are blue, the cars ahead and behind are amber, the sister car is teal, ticks are timing points, the amber arc is the pit lane. The **dashed circle** is where we would rejoin if we boxed now; the dashed outer arc is the stretch of lap the stop costs. Beside it: the window laps and the best lap to stop |
-| Race control | Race control messages from the feed when live; flags and our pit stops in replays |
-
-### Crew phone view
-
-Opens automatically on a phone: lap and time left, our positions and flag at the top, and three large buttons along the bottom — **Gaps** (ahead/behind, lap ring with the window, our class order, latest race control), **Pit window** (large lap ring and the stop table) and **Flags** (current flag and all race control messages). Each phone connects to the timing feed itself with Data source → 1 (recording is off by default on phones).
-
-### Analysis
-
-The original board is unchanged: leaderboard, team cards, pit-stop predictor, fuel and stint planner, gap and lap charts, time map, stints and pits, compare, race log, strategy calls and the feed inspector.
-
-**Replays:** Data source → 5 replays any 2026 Zenith race from the official timing at up to 300×. Both screens work exactly as live.
-
-**Settings:** hero, team and follow cars; track preset; race length; pit entry and exit (% of lap) for the lap ring; pit-loss mode and caution factor; fuel tank, burn and reserve per car; yellow-lap fuel factor; stint and drive-time limits; caution detection; proxy. Settings, calls and the learned data-set names stay in that browser — use Export / Import to move them between devices.
-
-## 5. Data and terms
-
-- Al Kamel Systems owns the live timing data, and both its page and the feed itself say it must not be redistributed. This tool doesn't redistribute it: in live mode each browser (yours, or a crew member's phone) reads the public feed for itself, and nothing is stored on or published to your site. Recordings are saved only to the computer that made them; keep them inside the team. A short note to Al Kamel or the series confirming a team may read the public feed for its own strategy is cheap insurance.
-- For a fully supported team feed, Al Kamel North America sells the **AKS V2** protocol (cloud or trackside), and P1TS already lists the Zenith classes on V2. The dashboard's strategy engine doesn't depend on where the timing comes from, so a V2 connector could be added later using the protocol documents that come with that subscription.
-- The replays inside the page are the series' official timing for every car. They are encrypted, but treat the page as private and check with the series before showing the data publicly.
-
-## 6. Folder guide
-
-| Folder | Publish? | Contents |
+| | **Website** (this repo on GitHub Pages) | **Laptop hub** (`hub\Start Pit Wall.bat`) |
 |---|---|---|
-| `1-publish-this/strategy/` | **Yes** | The encrypted page (`index.html`) |
-| `2-tools/` | No | `change-password.html` |
-| `3-optional-proxy/` | No | Cloudflare Worker for results-file fetching and the live relay |
-| `4-source-keep-private/` | **No — keep private** | Readable source, build script, tests and the unencrypted replays. Don't commit it to a public repository. |
+| What it is | Open the site on any laptop or phone, go to **Data source → Live → Connect**. That browser connects straight to Al Kamel. | A small program on the strategy laptop holds one connection to Al Kamel and pushes every update to the laptop screen and the crew phones. |
+| Install | Nothing | Python on the laptop |
+| A screen opened mid-race | Shows the race from that moment on. Fuel shows as *unknown* until the car's next stop, because the earlier laps and stops were missed. | Gets the full race history from the laptop, so lap history, stints and fuel are complete. |
+| Phones follow the laptop's settings | No, each device is set up separately | Yes: our car, track, fuel and so on |
+| Records the session | In the browser, with **Download recording** | Every message, to a file on the laptop |
+| Team pack (fuel numbers + replays) | Load it once per browser | Served to every screen automatically |
+| Use it for | Training with replays; a quick look from anywhere; a backup | **Race day** |
+
+On race day: run the hub on the strategy laptop and give the crew its address. Use the website for training and as a backup.
+
+---
+
+## 1. Put it on GitHub
+
+1. **Create the repository** on github.com (**New repository**).
+   - GitHub Pages addresses are `https://<account>.github.io/<repo-name>/`. A repository called `pit-wall` on the account `burressi` is served at `https://burressi.github.io/pit-wall/`.
+   - A repository called `burressi.pit-wall.io` would be served at `https://<account>.github.io/burressi.pit-wall.io/`. To use an address like `burressi.pit-wall.io` or `pit-wall.io`, you would need to own the domain `pit-wall.io` and add it under **Settings → Pages → Custom domain**.
+   - On a free GitHub account, Pages needs a **public** repository, and the site is public on every plan. This is why the team's fuel numbers, the race replays and the recordings are kept out of the repository (see section 2).
+2. **Upload the files.** Unzip, then either drag the contents into **Add file → Upload files** on the repository page, or use `git push`. `index.html` must be at the top level of the repository.
+3. **Turn on Pages:** **Settings → Pages → Build and deployment → Source: Deploy from a branch → Branch: `main`, folder `/ (root)` → Save.** The site is live within a minute or two.
+
+The page asks search engines not to index it. Even so, treat the address as public.
+
+## 2. The team pack (private, never on GitHub)
+
+`pit-wall-team-pack.json` holds:
+- the **fuel burn per track** for #177 and #178, from the team track sheets;
+- **replays of the 2026 Zenith races**, built from the official Al Kamel timing. They are for team training only and are not redistributed.
+
+The `.gitignore` already blocks `private/`, `*team-pack*.json` and recordings, so they can't be uploaded by mistake.
+
+- **Laptop hub:** put the file in the `private` folder (`pit-wall\private\pit-wall-team-pack.json`). The hub serves it to the laptop and the phones, and its window prints `Team pack: …` when it finds it.
+- **Website:** go to **Data source → Race replays**, drop the file once on each device. The browser keeps it until you click **Remove from this browser**.
+
+Without the team pack, the site uses generic fuel numbers (0.6 gal/lap) and has no built-in replays. You can still replay any session by dropping an official results CSV under **Data source → Official results file**.
+
+**Pick the track in Settings.** Picking a track loads its pit-lane times and, if the team pack is loaded, your burn rate for each car at that track.
+
+## 3. Laptop hub: one-time setup
+
+1. **Python.** Install it from python.org and tick **Add python.exe to PATH**. Your laptop already has it.
+2. **Get the files on the laptop:** on the repository page, **Code → Download ZIP**, or `git clone`. Unzip to a local folder such as `C:\PitWall` (not a OneDrive-synced folder, because recordings grow during a race). Put the team pack in `C:\PitWall\private\`.
+3. **First test:** in the `hub` folder, double-click **List Zenith sessions.bat**. It connects to Al Kamel and lists the sessions in your local time.
+4. **Windows Firewall:** the first time you run **Start Pit Wall**, allow Python on **both Private and Public** networks. Without this, crew phones can't connect.
+
+## 4. Race day
+
+1. Plug the laptop in and connect it to the internet (venue Wi-Fi or a phone hotspot).
+2. In the `hub` folder, double-click **Start Pit Wall.bat**. The window shows:
+   - `On this laptop: http://localhost:8765/`. The pit wall opens in the browser.
+   - `Crew phones: http://192.168.x.x:8765/`. This is the address for the crew.
+   - `Team pack: …`, which confirms your fuel numbers and replays were found.
+3. The hub follows the session that is running: practice, qualifying, then the race. To choose a session yourself, use **Data source → Session**.
+4. On the laptop, open **Settings** and set the track, our car, the team cars and race length (only needed if the feed doesn't give time remaining). Everything is sent to the crew phones.
+5. **Leave the black window open.** It keeps the laptop awake. Every 30 seconds it prints a status line.
+
+**Crew phones:** join the same Wi-Fi or hotspot as the laptop and open the crew address. The laptop's own hotspot works best at a track: **Settings → Network & internet → Mobile hotspot**. The address is then usually `http://192.168.137.1:8765/`. Use **Add to Home Screen** so it opens full screen. The phone layout has three buttons: **Gaps**, **Pit window** and **Flags**.
+
+**Crew away from the pit wall:** download Cloudflare's `cloudflared.exe` into the `hub` folder and run **Start Pit Wall + internet link.bat**. It prints an `https://….trycloudflare.com` link. To limit the link to named people, add `--tunnel-allow "a@x.com,b@y.com"` to the .bat file.
+
+## 5. Before relying on it
+
+| Piece | Status |
+|---|---|
+| Connecting to Al Kamel and receiving live data | Proven on the team laptop with the Ferrari Challenge feed (22 Nov 2026): all 14 data sets arrived and updated live. |
+| Exact data-set names for a live session (standings, pits, race control) | Only one is confirmed. The pit wall tries the likely names and remembers the ones that work. |
+| Reading positions, laps and pit state | Checked against a finished race, not yet mid-race. |
+| The website connecting straight from github.io | **Not yet confirmed.** Al Kamel may refuse connections from another website. If it does, use the laptop hub (not affected), the bridge fallback under **Data source**, or the optional proxy in `worker/`. |
+| Screens, phones, catch-up, reconnects, recording | Tested end to end against a stand-in Al Kamel server, in a real browser. |
+
+**Rehearsal: HSR Sebring Classic 12 Hour, 2–6 December.**
+1. Run **List HSR sessions.bat** on 1 December.
+2. During a live session, run **Rehearsal - HSR Sebring 12 Hour.bat**. Under **Data source**, check that every data set shows *ok* and that laps tick over.
+3. Also open the website on a phone and press **Connect** with series `hsr`. This tests the direct connection.
+4. If something shows *refused* or stays empty, either:
+   - open the session on the Al Kamel page, press F12 → Network → WS → Messages, filter on `params`, and paste the lines into **Data source → Advanced → Learn from capture**; or
+   - press **Copy diagnostics** and send that text.
+
+## 6. Troubleshooting
+
+| Symptom | Fix |
+|---|---|
+| Phone can't open the crew address | Use the same Wi-Fi or hotspot as the laptop. Allow Python through the firewall on Public networks. Try the laptop's own hotspot. |
+| `Port 8765 is in use` | The hub is already running in another window. |
+| `Al Kamel reconnecting` | The laptop lost internet. The hub retries by itself and keeps recording. |
+| "Fuel unknown" on the pit window | That screen or hub joined mid-race. It clears at our next stop, or drop the official results CSV to fill in the missed laps. |
+| FUEL CRITICAL far too early | Check **Settings**: is the track picked and the team pack loaded? Without them the burn rate is the generic 0.6 gal/lap. |
+| Standings empty in a live session | See section 5, step 4. |
+
+Hub options (`py hub\pitwall_hub.py --help`): `--series`, `--session <id>`, `--champ`, `--list`, `--port`, `--tunnel`, `--tunnel-allow`, `--learn <file>`, `--forget`, `--no-browser`.
+
+## 7. Al Kamel data
+
+Live timing data belongs to Al Kamel Systems, and their notice says it must not be redistributed. The site holds no timing data. Each browser or the team laptop fetches it directly, and the recordings and team pack stay off GitHub. Keep recordings and any internet link inside the team.
+
+---
+
+## For developers
+
+```
+index.html            the page (built; GitHub Pages and the hub both serve it)
+hub/                  pitwall_hub.py (Python 3.8+, standard library only) + Windows launchers
+source/app/           page source: app.html, app.css, js/ (engine, lt2 = Al Kamel feed, hub, live, pitwall, ui, charts, app)
+bridge/               bookmark/userscript for the bridge fallback
+worker/               optional Cloudflare Worker proxy
+tools/build.mjs       build (Node 18+, no packages)
+tools/build_replays.py  official Al Kamel CSVs -> private/replays/
+test/                 tests (most need private/replays)
+private/              git-ignored: team pack, replays
+```
+
+```bash
+node tools/build.mjs            # index.html (public: no replays, no team fuel; refuses to build if team numbers leak in)
+node tools/build.mjs --team     # private/team-pack.json
+node tools/build.mjs --dev      # dev/ build for the tests
+node test/engine_test.js; node test/lt2_test.js; node test/pitwall_test.js; node test/live_test.js; node test/bridge_test.js
+node test/hub_e2e.js            # stand-in Al Kamel server -> hub -> 5 screens, drops, hub restart
+node test/ui_hub_smoke.js; node test/hub_catchup_perf.js
+ZS_CSV_DIR=<folder with the CSVs> node test/ui_smoke.js
+```
+
+The standings `data` string field order is `LT2.DATA_MAP` in `source/app/js/lt2.js`. The subscription list is `DEFAULT_RECIPE` in `hub/pitwall_hub.py` and `LT2.DEFAULT_RECIPE` in `lt2.js`.

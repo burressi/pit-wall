@@ -1,0 +1,9 @@
+name = "zenith-strategy-proxy"
+main = "zenith-proxy.js"
+compatibility_date = "2026-11-01"
+
+[vars]
+# Your pit wall site origin, e.g. "https://burressi.github.io" (no trailing slash)
+ALLOWED_ORIGIN = "https://YOUR-GITHUB-ACCOUNT.github.io"
+
+# The access key is a secret — set it with:  npx wrangler secret put ACCESS_KEY

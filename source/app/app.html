@@ -1,0 +1,80 @@
+<div id="zs-app">
+  <header class="topbar">
+    <div class="brand" title="Zenith race strategy · Cambern Performance"><span class="logo">Z</span></div>
+    <div class="hd-sess"><div id="sess-name" class="hd-series">No session</div><div class="hd-lap"><span id="hd-lap">Lap –</span> · <span id="clk-rem">--:--</span> left</div><div id="sess-track" class="hd-sub">Choose a data source to begin</div></div>
+    <div id="flag-chip" class="flag flag-NONE"><span class="pw-dot" aria-hidden="true"></span><span id="flag-text">NO SESSION</span></div>
+    <div id="hd-car" class="hd-car"></div>
+    <div id="hd-wx" class="hd-wx"></div>
+    <div class="hd-clk"><span>Elapsed <b id="clk-el">--:--</b></span><span>Track time <b id="clk-tod">--:--</b></span></div>
+    <div id="src-chip" class="src src-off"><span class="dot"></span><span id="src-text">OFFLINE</span></div>
+    <nav class="actions">
+      <div class="viewsel" role="group" aria-label="Screen"><button type="button" data-view="pitwall" class="on">Pit wall</button><button type="button" data-view="analysis">Analysis</button></div>
+      <div class="herosel" id="hero-sel" title="Our car"></div>
+      <button type="button" data-act="source" class="btn primary">Data source</button>
+      <button type="button" data-act="settings" class="btn" aria-label="Settings">Settings</button>
+    </nav>
+  </header>
+
+  <div id="replaybar" class="replaybar" hidden>
+    <button type="button" class="btn" data-act="rp-play" id="rp-play">Play</button>
+    <select id="rp-speed" aria-label="Replay speed">
+      <option value="1">1×</option><option value="5">5×</option><option value="10" selected>10×</option><option value="30">30×</option><option value="60">60×</option><option value="300">300×</option>
+    </select>
+    <input type="range" id="rp-pos" min="0" max="1000" value="0" aria-label="Replay position">
+    <span id="rp-time" class="mono">0:00:00</span>
+    <button type="button" class="btn ghost" data-act="rp-back">−5 min</button>
+    <button type="button" class="btn ghost" data-act="rp-fwd">+5 min</button>
+    <span class="hint">Replay of official Al Kamel timing — every strategy panel behaves exactly as it will live.</span>
+  </div>
+
+  <div id="alerts" class="alerts"></div>
+
+  <section id="view-pitwall" class="pw"><div id="pw-main"></div><div id="pw-phone"></div></section>
+
+  <main class="grid" id="view-analysis" hidden>
+    <section class="panel board">
+      <div class="panel-head">
+        <div class="tabs" id="cls-tabs"></div>
+        <div class="legend"><span class="lg hero">Hero</span><span class="lg sister">Sister</span><span class="lg follow">Follow</span><span class="muted small">Click a row to chart it · double-click to follow</span></div>
+      </div>
+      <div class="board-wrap"><table id="board" class="tbl"><thead></thead><tbody></tbody></table></div>
+    </section>
+
+    <aside class="side">
+      <div id="team-cards"></div>
+      <section class="panel" id="pitpred"></section>
+      <section class="panel" id="fuelpanel"></section>
+    </aside>
+
+    <section class="panel bottom">
+      <div class="panel-head"><div class="tabs" id="btabs">
+        <button type="button" data-tab="gap" class="on">Gap chart</button>
+        <button type="button" data-tab="laps">Lap times</button>
+        <button type="button" data-tab="map">Time map</button>
+        <button type="button" data-tab="stints">Stints &amp; pits</button>
+        <button type="button" data-tab="compare">Compare</button>
+        <button type="button" data-tab="log">Race log</button>
+        <button type="button" data-tab="calls">Strategy calls</button>
+        <button type="button" data-tab="inspect">Feed inspector</button>
+      </div><div id="chart-cars" class="chips"></div></div>
+      <div class="tabbody" id="tab-gap"><div class="chart-opts"><label><input type="radio" name="gapmode" value="hero" checked> Gap to hero</label><label><input type="radio" name="gapmode" value="leader"> Gap to class leader</label><span class="muted small">Shaded band = cars a stop would let past (pit loss). ▲ = pit lap.</span></div><canvas id="cv-gap" class="cv"></canvas></div>
+      <div class="tabbody" id="tab-laps" hidden><canvas id="cv-laps" class="cv"></canvas></div>
+      <div class="tabbody" id="tab-map" hidden><div class="mapwrap"><canvas id="cv-map" class="cv cv-map"></canvas><div id="map-side" class="mapside"></div></div></div>
+      <div class="tabbody" id="tab-stints" hidden></div>
+      <div class="tabbody" id="tab-compare" hidden></div>
+      <div class="tabbody" id="tab-log" hidden></div>
+      <div class="tabbody" id="tab-calls" hidden></div>
+      <div class="tabbody" id="tab-inspect" hidden></div>
+    </section>
+  </main>
+
+  <dialog id="dlg-source" class="dlg">
+    <div class="dlg-head"><h2>Data source</h2><button type="button" class="btn ghost" data-act="close">Close</button></div>
+    <div class="dlg-body" id="source-body"></div>
+  </dialog>
+  <dialog id="dlg-settings" class="dlg">
+    <div class="dlg-head"><h2>Settings</h2><button type="button" class="btn ghost" data-act="close">Close</button></div>
+    <div class="dlg-body" id="settings-body"></div>
+  </dialog>
+  <div id="toast" class="toast" hidden></div>
+</div>
